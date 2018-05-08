@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace SoccerStats
 {
@@ -12,17 +13,20 @@ namespace SoccerStats
     {
         static void Main(string[] args)
         {
-            string currentDirectory = Directory.GetCurrentDirectory();
-            DirectoryInfo directory = new DirectoryInfo(currentDirectory);
-            var fileName = Path.Combine(directory.FullName, "SoccerGameResults.csv");
-            var fileContents = ReadSoccerResults(fileName);
-            fileName = Path.Combine(directory.FullName, "players.json");
-            var players = DeserializePlayers(fileName);
-            var topTen = GetTopTenPlayers(players);
-            foreach (var player in topTen)
-            {
-                Console.WriteLine("Name: " + player.FirstName + " " + player.LastName + " PPG: " + player.PointsPerGame);
-            }
+            //string currentDirectory = Directory.GetCurrentDirectory();
+            //DirectoryInfo directory = new DirectoryInfo(currentDirectory);
+            //var fileName = Path.Combine(directory.FullName, "SoccerGameResults.csv");
+            //var fileContents = ReadSoccerResults(fileName);
+            //fileName = Path.Combine(directory.FullName, "players.json");
+            //var players = DeserializePlayers(fileName);
+            //var topTen = GetTopTenPlayers(players);
+            //foreach (var player in topTen)
+            //{
+            //    Console.WriteLine("Name: " + player.FirstName + " " + player.LastName + " PPG: " + player.PointsPerGame);
+            //}
+            //fileName = Path.Combine(directory.FullName, "topten.json");
+            //SerializePlayersToFile(topTen, fileName);
+            Console.WriteLine(GetNewsForPlayer("Diego Valeri"));
             Console.ReadLine();
         }
 
@@ -85,11 +89,11 @@ namespace SoccerStats
                     }
 
                     soccerResults.Add(gameResult);
-                    
+
                 }
             }
             return soccerResults;
-     
+
         }
 
         public static List<Player> DeserializePlayers(string fileName)
@@ -119,5 +123,40 @@ namespace SoccerStats
             }
             return topTen;
         }
-    } 
+
+        public static void SerializePlayersToFile(List<Player> players, string fileName)
+        {
+            var serializer = new JsonSerializer();
+            using (var writer = new StreamWriter(fileName))
+            using (var jsonWriter = new JsonTextWriter(writer))
+            {
+                serializer.Serialize(jsonWriter, players);
+            }
+        }
+
+        public static string GetGoogleHomepage()
+        {
+            var webClient = new WebClient();
+            byte[] googleHome = webClient.DownloadData("https://www.google.com");
+
+            using (var stream = new MemoryStream(googleHome))
+            using (var reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
+        public static string GetNewsForPlayer(string playerName)
+        {
+            var webClient = new WebClient();
+            webClient.Headers.Add("Ocp-Apim-Subscription-Key", "7ca3bcf37f4b4ee9a7ab3da4dc193b01");
+            byte[] searchResults = webClient.DownloadData(string.Format("https://api.cognitive.microsoft.com/bing/v7.0/search?q={0}", playerName));
+
+            using (var stream = new MemoryStream(searchResults))
+            using (var reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+    }
 }
