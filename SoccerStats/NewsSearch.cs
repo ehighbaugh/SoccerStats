@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,8 @@ namespace SoccerStats
     {
         public string _type { get; set; }
         public Querycontext queryContext { get; set; }
-        public Webpages webPages { get; set; }
+        [JsonProperty(PropertyName = "webPages")]
+        public NewsResult NewsResults { get; set; }
         public Relatedsearches relatedSearches { get; set; }
         public Rankingresponse rankingResponse { get; set; }
     }
@@ -25,16 +27,18 @@ namespace SoccerStats
     {
         public string webSearchUrl { get; set; }
         public int totalEstimatedMatches { get; set; }
-        public Value[] value { get; set; }
+        //public List<NewsResult> NewsResults { get; set; }
     }
 
-    public class Value
+    public class NewsResult
     {
         public string id { get; set; }
-        public string name { get; set; }
+        [JsonProperty(PropertyName = "name")]
+        public string Headline { get; set; }
         public string url { get; set; }
         public string displayUrl { get; set; }
-        public string snippet { get; set; }
+        [JsonProperty(PropertyName = "snippet")]
+        public string Summary { get; set; }
         public Deeplink[] deepLinks { get; set; }
     }
 
